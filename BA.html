@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>אירוע התרמה</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; direction: rtl; }
+        .container { max-width: 600px; margin: auto; }
+        #pledges { margin-top: 20px; border: 1px solid #ddd; padding: 10px; }
+        .pledge { background: #f9f9f9; margin: 5px 0; padding: 10px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ברוכים הבאים לאירוע ההתרמה</h1>
+        <p>אנא הזינו את ההתחייבות שלכם</p>
+        <input type="text" id="name" placeholder="שם">
+        <input type="number" id="amount" placeholder="סכום">
+        <button onclick="addPledge()">התחייב</button>
+        
+        <h2>התחייבויות:</h2>
+        <div id="pledges"></div>
+    </div>
+
+    <script>
+        function addPledge() {
+            let name = document.getElementById('name').value;
+            let amount = document.getElementById('amount').value;
+            if(name && amount) {
+                let pledgeList = document.getElementById('pledges');
+                let pledge = document.createElement('div');
+                pledge.className = 'pledge';
+                pledge.innerHTML = `<strong>${name}</strong> התחייב/ה לתרום ${amount} ש"ח`;
+                pledgeList.appendChild(pledge);
+                document.getElementById('name').value = '';
+                document.getElementById('amount').value = '';
+            }
+        }
+    </script>
+</body>
+</html>
