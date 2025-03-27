@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>רשימת תורמים</title>
+    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Assistant', sans-serif;
+            background-image: url('reka.jpg');
+            background-size: 100% 100%;
+            background-position: center;
+            background-repeat: no-repeat;
+            color: #004d40;
+            text-align: center;
+            direction: rtl;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            height: 100vh;
+        }
+        #logoDisplay {
+            max-width: 10vw;
+            display: block;
+            margin: 1vh auto;
+        }
+        #totalAmount {
+            position: fixed;
+            top: 2vh;
+            right: 2vw;
+            background-color: #00796b;
+            color: white;
+            padding: 1.5vh;
+            border-radius: 10px;
+            font-size: 2.5vw;
+            font-weight: bold;
+            z-index: 1000;
+            width: 30vw;
+            height: 10vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        #campaignTitle {
+            font-size: 2.5vw;
+            margin-top: 1vh;
+            margin-bottom: 1vh;
+        }
+        .donors-grid {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(15vw, 1fr));
+            grid-auto-rows: minmax(10vh, auto);
+            gap: 1vh;
+            width: 90%;
+            margin: 0 auto;
+            padding-top: 2vh;
+        }
+        .donor-card {
+            background: #FFFFFF;
+            padding: 1.5vh;
+            border-radius: 15px;
+            color: #fff;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 8vh;
+            gap: 1vh;
+        }
+        .donor-name {
+            font-size: 2vw;
+            font-weight: bold;
+        }
+        .donor-amount {
+            font-size: 1.8vw;
+        }
+        .toast {
+            visibility: hidden;
+            position: fixed;
+            bottom: 2vh;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #ff5722;
+            color: white;
+            padding: 2vh;
+            border-radius: 10px;
+            font-size: 2vw;
+            font-weight: bold;
+            z-index: 1000;
+        }
+        .toast.show {
+            visibility: visible;
+        }
+    </style>
+</head>
+<body>
+    <img id="logoDisplay" src="logo.jpg" alt="לוגו">
+    <div id="totalAmount">סכום כולל: 0₪</div>
+    <h1 id="campaignTitle"></h1>
+    <div class="donors-grid" id="donorsList"></div>
+    <div id="toast" class="toast"></div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            function updateColors() {
+                document.body.style.backgroundColor = localStorage.getItem("bgColor") || "transparent";
+                document.body.style.color = localStorage.getItem("textColor") || "#004d40";
+
+                const totalAmount = document.getElementById("totalAmount");
+                totalAmount.style.backgroundColor = localStorage.getItem("totalColor") || "#00796b";
+                totalAmount.style.color = localStorage.getItem("totalTextColor") || "white";
+
+                const toast = document.getElementById("toast");
+                toast.style.backgroundColor = localStorage.getItem("toastBgColor") || "#ff5722";
+                toast.style.color = localStorage.getItem("toastTextColor") || "white";
+            }
+
+            function loadDonors() {
+                const donorsList = JSON.parse(localStorage.getItem("donors")) || [];
+                const donorsContainer = document.getElementById("donorsList");
+                const totalAmount = document.getElementById("totalAmount");
+                const campaignTitle = document.getElementById("campaignTitle");
+
+                campaignTitle.textContent = localStorage.getItem("campaignTitle") || "קמפיין הצדקה שלנו";
+
+                donorsContainer.innerHTML = "";
+
+                let sum = 0;
+                donorsList.forEach(donor => sum += parseFloat(donor.amount) || 0);
+                totalAmount.textContent = `סכום כולל: ${sum.toLocaleString()}₪`;
+
+                const shuffledDonors = donorsList.sort(() => 0.5 - Math.random()).slice(0, 20);
+                shuffledDonors.forEach(donor => {
+                    const card = document.createElement("div");
+                    card.className = "donor-card";
+                    card.style.backgroundColor = localStorage.getItem("cardColor") || "#00796b";
+                    card.innerHTML = `<div class="donor-name"><strong>${donor.name}</strong></div><div class="donor-amount">${donor.amount}₪</div>`;
+                    donorsContainer.appendChild(card);
+                });
+
+                updateColors();
+                showNewDonation();
+            }
+
+            let lastDonorCount = 0;
+            function showNewDonation() {
+                const donorsList = JSON.parse(localStorage.getItem("donors")) || [];
+                if (donorsList.length === 0 || donorsList.length === lastDonorCount) return;
+
+                const lastDonor = donorsList[donorsList.length - 1];
+                const toast = document.getElementById("toast");
+                
+                toast.textContent = `${lastDonor.name} התחייב ${lastDonor.amount}₪!`;
+                toast.classList.add("show");
+                setTimeout(() => toast.classList.remove("show"), 5000);
+
+                lastDonorCount = donorsList.length;
+            }
+
+            loadDonors();
+            setInterval(loadDonors, 5000);
+        });
+    </script>
+</body>
+</html>
